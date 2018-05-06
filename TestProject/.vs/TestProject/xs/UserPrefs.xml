@@ -1,0 +1,17 @@
+﻿<Properties StartupConfiguration="{8E1C2576-245E-02BE-F560-937F7A66896E}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/GameFlow/TestEventsScript/SpawnArray.cs">
+    <Files>
+      <File FileName="Assets/Scripts/GameFlow/Game/GameConditionsController.cs" Line="161" Column="1" />
+      <File FileName="Assets/Scripts/GameFlow/TestEventsScript/SpawnArray.cs" Line="38" Column="109" />
+      <File FileName="Assets/Scripts/GameFlow/Tile/Row.cs" Line="26" Column="112" />
+      <File FileName="Assets/Scripts/GameFlow/Tile/TileSpawner.cs" Line="263" Column="11" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.ItemProperties.TestProject PreferredExecutionTarget="Unity.Editor" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+</Properties>
