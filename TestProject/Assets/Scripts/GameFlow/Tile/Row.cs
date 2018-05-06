@@ -16,7 +16,7 @@ public class Row : MonoBehaviour
     float countOfCellsY;
     float yCellHeight;
     float screenHeight;
-    bool isStarted = false;
+   
     int currentLinePos;
     int prevLinePos = 3;
 
@@ -27,7 +27,15 @@ public class Row : MonoBehaviour
     #region Properties
 
     bool isNeedToMakeTransition{ get; set; }
+
+
     bool isNeedToChangePosition { get; set; }
+
+
+   public bool IsStarted { get; set; }
+
+
+    public bool IsAlive { get; set; }
 
     #endregion
 
@@ -36,7 +44,8 @@ public class Row : MonoBehaviour
     #region Unity lifecycle
 
     void Start()
-    {       
+    {
+        IsStarted = false;
         speed *= Time.fixedDeltaTime;
     }
 
@@ -52,23 +61,31 @@ public class Row : MonoBehaviour
     {
         SpawnArray.Instance.SetLinePosition += GetLineInfo;
         SpawnArray.Instance.spawnBooster += SpawnBooster;
+        SpawnArray.Instance.setStarted += SetStarted;
+        SpawnArray.Instance.setAlive += SetAlive;
+        Ball.Instance.setAlive += SetAlive;
     }
 
     void OnDisable()
     {
         SpawnArray.Instance.SetLinePosition -= GetLineInfo;
         SpawnArray.Instance.spawnBooster += SpawnBooster;
+        SpawnArray.Instance.setStarted -= SetStarted;
+        SpawnArray.Instance.setAlive -= SetAlive;
+        Ball.Instance.setAlive -= SetAlive;
+
     }
 
 
 
     void FixedUpdate ()
     {       
-        if (Input.GetKeyDown(KeyCode.Space))
-            isStarted = ! isStarted;
+        
+        if (IsStarted)
+        {
+            Run();
 
-        if( isStarted)
-        Run();
+        }
     }
 
     #endregion
@@ -84,6 +101,7 @@ public class Row : MonoBehaviour
             {
                 isNeedToChangePosition = true;             
                 ActivateRow();
+                DeactivateBooster();
                 DeactivateCell(currentLinePos);
                 transform.position = new Vector3(transform.position.x, newPosition);
                 SpawnArray.Instance.Counter++;
@@ -122,6 +140,7 @@ public class Row : MonoBehaviour
 
     public void MakeTransition( )
     {
+        
         int min;
         int max;
         if (Mathf.Min(prevLinePos, currentLinePos) == prevLinePos)
@@ -136,7 +155,7 @@ public class Row : MonoBehaviour
         }
 
 
-        for (int i = min; i < max + 1; i++)
+        for (int i = min ; i < max +1; i++)
         {
             DeactivateCell(i);
         }
@@ -161,13 +180,16 @@ public class Row : MonoBehaviour
 
 
     public void DeactivateCell(int position)
-    {
+    {       
         cellsList[position].GetComponent<Cell>().SpriteCondition(false);
     }
     
     public void DeactivateBooster()
     {
-        //cellsList[currentLinePos].GetComponent<Cell>().BoosterCondition(false);
+        for (int i = 0; i < cellsList.Count; i++)
+        {
+            cellsList[i].GetComponent<Cell>().BoosterCondition(false);
+        }
     } 
 
     public void DeactivateRow()
@@ -205,6 +227,20 @@ public class Row : MonoBehaviour
         {
             cellsList[currentLinePos].GetComponent<Cell>().BoosterCondition(true);
         }
+    }
+
+
+
+    public void SetStarted(bool isStarted)
+    {
+        Debug.Log("SetStarted");
+        IsStarted = isStarted;
+    }
+
+    public void SetAlive(bool isAlive)
+    {
+        Debug.Log("SetAlive");
+        IsAlive = isAlive;
     }
 
     #endregion

@@ -3,9 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Ball : MonoBehaviour
+public class Ball : SingletonMonoBehaviour<Ball>
 {
     #region Variables
+
+
+    public delegate void SetPlayerAlive(bool isAlive);
+
+
+    public event SetPlayerAlive setAlive;
 
     const float SPEED = 15f;
     const float DISPLACEMENT_X = 400f;
@@ -55,8 +61,13 @@ public class Ball : MonoBehaviour
         {
             isIMmortal = value;
         }
-
     }
+
+
+    public bool isStarted {get; set;}
+
+
+    public bool isAlive {get; set;}
 
 
     public bool IsReadyToJumpProperty
@@ -111,6 +122,7 @@ public class Ball : MonoBehaviour
             ScoreController.instance.StopAllCoroutines();
             TileSpawner.Instance.StopAllCoroutines();
             StopAllCoroutines();
+            setAlive(false);
             GameConditionsController.Instance.IsAlive = false;
             Scheduler.Instance.CallMethodWithDelay(this.gameObject, ShowDeathMenu, showDeathMenuDelayTime);
         }

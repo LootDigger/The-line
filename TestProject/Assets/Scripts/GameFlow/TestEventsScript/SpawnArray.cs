@@ -11,10 +11,15 @@ public class SpawnArray : SingletonMonoBehaviour<SpawnArray>
     public delegate void UpdateCellInfo(float cellWidth, float cellHeight);
     public delegate void SpawnBooster(int position);
     public delegate void GetLinePosition(int currentLinePos);
+    public delegate void SetGameStarted(bool isStarted);
+    public delegate void SetPlayerAlive(bool isAlive);
 
     public event SpawnBooster spawnBooster;
     public event UpdateCellInfo UpdateInfo;
     public event GetLinePosition SetLinePosition;
+    public event SetGameStarted setStarted;
+    public event SetPlayerAlive setAlive;
+
 
     Vector3 cellScale = Vector3.one; 
 
@@ -52,7 +57,7 @@ public class SpawnArray : SingletonMonoBehaviour<SpawnArray>
         {            
             counter = value;
             boosterCounter++;
-            Debug.Log(boosterCounter);
+          
         }
     }
     
@@ -79,7 +84,15 @@ public class SpawnArray : SingletonMonoBehaviour<SpawnArray>
             }
 
 
-        if(counter == lineLength)
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            setStarted(true);
+            setAlive(true);
+            Debug.Log("Space");
+        }
+
+
+            if(counter == lineLength)
         {
             counter = 0;
             CalculateNewLinePosition();
