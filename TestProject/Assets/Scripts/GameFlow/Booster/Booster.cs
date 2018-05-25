@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class Booster : MonoBehaviour {
 
-public class Booster : MonoBehaviour 
-{
+
     #region Variables
 
     private const float FLICKER_RATE = 0.2f; 
@@ -22,7 +22,7 @@ public class Booster : MonoBehaviour
 
     #region Properties
 
-    public bool IsImmortableBoosterProperty
+    public bool isImmortableBoosterProperty
     {
         get
         {

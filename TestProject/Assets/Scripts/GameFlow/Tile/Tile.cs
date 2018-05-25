@@ -9,8 +9,7 @@ public class Tile : MonoBehaviour
 
     private const float REVERT_POSITION_Y = -180f;
     private const int MIDDLE_CELL_POS = 3;
-    private const float SCREEN_HEIGHT = 1136f;
-    private const float SCREEN_WIDTH = 640f;
+
 
     [SerializeField] GameObject[] sprites;
     [SerializeField] GameObject[] boosters;
@@ -31,7 +30,7 @@ public class Tile : MonoBehaviour
 
     void Start()
     {
-        updatedSplitSpawnPos = new Vector3(SCREEN_WIDTH/2 + 70, 1250 , 0);
+        updatedSplitSpawnPos = new Vector3(0, 1250, 0);
         time = 0;
     }
 
@@ -53,42 +52,42 @@ public class Tile : MonoBehaviour
         {
             SetActivityTo(true);
             ChangeColorTo(Color.white);
-            DestroyElement(TileSpawner.Instance.CurrentTonnelPositionProperty);
-            if (TileSpawner.Instance.CounterProperty == TileSpawner.Instance.GrowLengthProperty - 1)
+            DestroyElement(TileSpawner.instance.currentTonnelPositionProperty);
+            if (TileSpawner.instance.counterProperty == TileSpawner.instance.growLengthProperty - 1)
             {
-                TileSpawner.Instance.IsNeedToMakeTransitionProperty = true;
-                TileSpawner.Instance.CounterProperty = 0;
+                TileSpawner.instance.isNeedToMakeTransitionProperty = true;
+                TileSpawner.instance.counterProperty = 0;
 
-                leftDirLength = TileSpawner.Instance.CurrentTonnelPositionProperty - TileSpawner.Instance.DirectionGrowLengthProperty;
-                rightDirLength = TileSpawner.Instance.CurrentTonnelPositionProperty + TileSpawner.Instance.DirectionGrowLengthProperty;
+                leftDirLength = TileSpawner.instance.currentTonnelPositionProperty - TileSpawner.instance.directionGrowLengthProperty;
+                rightDirLength = TileSpawner.instance.currentTonnelPositionProperty + TileSpawner.instance.directionGrowLengthProperty;
                 
 
-                TileSpawner.Instance.PrevTonnelPositionProperty = TileSpawner.Instance.CurrentTonnelPositionProperty;
-                if (TileSpawner.Instance.CurrentTonnelPositionProperty < MIDDLE_CELL_POS)
+                TileSpawner.instance.prevTonnelPositionProperty = TileSpawner.instance.currentTonnelPositionProperty;
+                if (TileSpawner.instance.currentTonnelPositionProperty < MIDDLE_CELL_POS)
                 {
-                    TileSpawner.Instance.CurrentTonnelPositionProperty = Random.Range(2, 4);
+                    TileSpawner.instance.currentTonnelPositionProperty = Random.Range(2, 4);
                 }
-                if (TileSpawner.Instance.CurrentTonnelPositionProperty > MIDDLE_CELL_POS)
+                if (TileSpawner.instance.currentTonnelPositionProperty > MIDDLE_CELL_POS)
                 {
-                    TileSpawner.Instance.CurrentTonnelPositionProperty = Random.Range(3, 5);
+                    TileSpawner.instance.currentTonnelPositionProperty = Random.Range(3, 5);
                 }
 
-                if (TileSpawner.Instance.CurrentTonnelPositionProperty == MIDDLE_CELL_POS)
+                if (TileSpawner.instance.currentTonnelPositionProperty == MIDDLE_CELL_POS)
                 {
-                    TileSpawner.Instance.CurrentTonnelPositionProperty = Random.Range(2, 5);
+                    TileSpawner.instance.currentTonnelPositionProperty = Random.Range(2, 5);
                 }
 
             }
             else
             {
-                if (TileSpawner.Instance.CounterProperty < TileSpawner.Instance.GrowLengthProperty)
-                    TileSpawner.Instance.CounterProperty++;
+                if (TileSpawner.instance.counterProperty < TileSpawner.instance.growLengthProperty)
+                    TileSpawner.instance.counterProperty++;
             }
 
             transform.position = updatedSplitSpawnPos;
         }
 
-        if (TileSpawner.Instance.IsNeedToMakeTransitionProperty)
+        if (TileSpawner.instance.isNeedToMakeTransitionProperty)
         {
             MakeTransition();
         }
@@ -111,11 +110,13 @@ public class Tile : MonoBehaviour
         sprites[4].SetActive(boolean);
         sprites[5].SetActive(boolean);
         sprites[6].SetActive(boolean);
+
     }
 
 
     public void DisableBoosters()
     {
+
         boosters[0].SetActive(false);
         boosters[1].SetActive(false);
         boosters[2].SetActive(false);
@@ -147,26 +148,27 @@ public class Tile : MonoBehaviour
     
     public void MakeTransition()
     {
-        if(TileSpawner.Instance.CurrentTonnelPositionProperty > TileSpawner.Instance.PrevTonnelPositionProperty)
+
+        if(TileSpawner.instance.currentTonnelPositionProperty > TileSpawner.instance.prevTonnelPositionProperty)
         {
-            for (int i = TileSpawner.Instance.PrevTonnelPositionProperty; i <= TileSpawner.Instance.CurrentTonnelPositionProperty; i++)
+            for (int i = TileSpawner.instance.prevTonnelPositionProperty; i <= TileSpawner.instance.currentTonnelPositionProperty; i++)
             {
                 DestroyElement(i);
             }
 
         }
 
-        else if(TileSpawner.Instance.CurrentTonnelPositionProperty < TileSpawner.Instance.PrevTonnelPositionProperty)
+        else if(TileSpawner.instance.currentTonnelPositionProperty < TileSpawner.instance.prevTonnelPositionProperty)
         {
 
-            for (int i = TileSpawner.Instance.CurrentTonnelPositionProperty; i < TileSpawner.Instance.PrevTonnelPositionProperty; i++)
+            for (int i = TileSpawner.instance.currentTonnelPositionProperty; i < TileSpawner.instance.prevTonnelPositionProperty; i++)
             {
                 DestroyElement(i);
             }
 
         }
 
-        TileSpawner.Instance.IsNeedToMakeTransitionProperty = false;
+        TileSpawner.instance.isNeedToMakeTransitionProperty = false;
 
     }
 

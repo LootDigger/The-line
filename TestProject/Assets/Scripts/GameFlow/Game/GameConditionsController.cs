@@ -2,32 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameConditionsController : SingletonMonoBehaviour<GameConditionsController>
+public class GameConditionsController : MonoBehaviour
 {
 
     #region Variables 
 
-    private const float SCREEN_HEIGHT = 1136f;
-    private const float SCREEN_WIDTH = 640f;
+    internal static GameConditionsController instance = null;
+
 
     [SerializeField] tk2dUIItem startGameButton;
     [SerializeField] tk2dUIItem restart;
     [SerializeField] tk2dUIItem restartSecondItem;
     [SerializeField] GameObject startTextGO;
-    [SerializeField] int countOfCellsY = 11;
-    [SerializeField] int countOfCellsX = 7;
-    [SerializeField] Color endColor;
-    [SerializeField] float speed;
-    [SerializeField] float boosterSpawnFrequency;
+        
 
-
-    bool isStarted;
-    bool isOnPauseMenu;
-    bool isAlive;
-    bool isReadyTORestart;
-    int currentLinePosition;
-    float cellHeight = 160;
-    float cellWidth = 90;
+    private Color endColor;
+    private bool isStarted;
+    private bool isOnPauseMenu;
+    private bool isAlive;
+    private bool isReadyTORestart;
 
     #endregion
 
@@ -35,87 +28,6 @@ public class GameConditionsController : SingletonMonoBehaviour<GameConditionsCon
 
     #region Properties
 
-    public float SpawnFrequency
-    {
-        get
-        {
-            return boosterSpawnFrequency;            
-        }
-    }
-
-
-
-    public float Speed
-    {
-        get
-        {
-            return speed;
-        }
-    }
-
-
-    public float CellHeight
-    {
-        get
-        {
-            return cellHeight;
-        }
-        set
-        {
-            cellHeight = value;
-        }
-    }
-
-
-    public float CellWidth
-    {
-        get
-        {
-            return cellWidth;
-        }
-        set
-        {
-            cellWidth = value;
-        }
-    }
-    
-
-    public float ScreenHeight
-    {
-        get
-        {
-            return SCREEN_HEIGHT;
-        }
-    }
-
-
-    public float ScreenWidth
-    {
-        get
-        {
-            return SCREEN_WIDTH;
-        }
-    }
-    
-
-    public float CountOfCellsY
-    {
-        get
-        {
-            return countOfCellsY;
-        }
-    }
-
-
-    public float CountOfCellsX
-    {
-        get
-        {
-            return countOfCellsX;
-        }
-    }
-
-    
     public bool IsStartedProperty
     {
         get
@@ -129,7 +41,6 @@ public class GameConditionsController : SingletonMonoBehaviour<GameConditionsCon
 
     }
    
-
     public bool IsAlive
     {
         get
@@ -141,7 +52,6 @@ public class GameConditionsController : SingletonMonoBehaviour<GameConditionsCon
             isAlive = value;
         }
     }
-
 
     public bool IsReadyTORestartProperty
     {
@@ -155,7 +65,6 @@ public class GameConditionsController : SingletonMonoBehaviour<GameConditionsCon
         }
     }
 
-
     public bool IsOnPauseMenuproperty {
         get
         {
@@ -165,6 +74,8 @@ public class GameConditionsController : SingletonMonoBehaviour<GameConditionsCon
         {
             isOnPauseMenu = value;
         }
+
+
     }
 
     #endregion
@@ -175,64 +86,58 @@ public class GameConditionsController : SingletonMonoBehaviour<GameConditionsCon
 
     void Start()
     {       
+        if (instance == null)
+            instance = this;
+        else if (instance == this)
+            Destroy(gameObject);
+
         isReadyTORestart = false;
         IsStartedProperty = false;
         endColor = new Color(1, 1, 1, 0);
-        TileSpawner.Instance.BuildLvl();
-        currentLinePosition = (countOfCellsX + 1) / 2;
+        TileSpawner.instance.BuildLvl();
     }
 
-     void Instance_UpdateInfo(float cellWidth, float cellHeight)
-    {
-        this.cellHeight = cellHeight;
-        this.cellWidth = cellWidth;
-    }
 
     private void OnEnable()
     {
         startGameButton.OnClick += Button_Begin;
         restart.OnClick += Button_GCReplay;
         restartSecondItem.OnClick += Button_GCReplay;
-        SpawnArray.Instance.UpdateInfo += Instance_UpdateInfo;
     }
 
 
     private void OnDisable()
     {
+
         startGameButton.OnClick -= Button_Begin;
         restart.OnClick -= Button_GCReplay;
         restartSecondItem.OnClick -= Button_GCReplay;
-        SpawnArray.Instance.UpdateInfo -= Instance_UpdateInfo;
+
     }
 
 
     void Update()
     {
-        if (TileSpawner.Instance.IsPausedProperty && !isOnPauseMenu)
+        if (TileSpawner.instance.isPausedProperty && !isOnPauseMenu)
         {
             isOnPauseMenu = true;
+
         }
-        else if (!TileSpawner.Instance.IsPausedProperty && isOnPauseMenu)
+        else if (!TileSpawner.instance.isPausedProperty && isOnPauseMenu)
         {
             isOnPauseMenu = false;
         }
     }
 
     #endregion
-    
+
+
 
     #region Public methods
 
     public void ShowDeathMenu()
     {
         DeathMenuActivator.instance.ActivateColor();
-    }
-
-
-    public void CalculateLength()
-    {
-        
-
     }
 
     #endregion
@@ -248,12 +153,12 @@ public class GameConditionsController : SingletonMonoBehaviour<GameConditionsCon
             IsStartedProperty = false;
         IsAlive = true;
         DeathMenuActivator.instance.DiactivateColor();
-        ScoreController.instance.ScoreProperty = 0;
-        TileSpawner.Instance.StopAllCoroutines();
+        ScoreController.instance.scoreProperty = 0;
+        TileSpawner.instance.StopAllCoroutines();
 
             if (isOnPauseMenu)
             {
-               TileSpawner.Instance.RestartLvl();
+               TileSpawner.instance.RestartLvl();
                Scheduler.Instance.CallMethodWithDelay(this.gameObject, PauseMenuActivator.Instance.DiactivateColor,1.5f);
             }
         }
@@ -265,12 +170,10 @@ public class GameConditionsController : SingletonMonoBehaviour<GameConditionsCon
         if (!IsStartedProperty)
         {
             TweenColor.SetColor(startTextGO, endColor,1);
-            TileSpawner.Instance.StartGame();
+            TileSpawner.instance.StartGame();
             IsStartedProperty = true;
         }
     }
-
-
 
     #endregion
 

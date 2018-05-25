@@ -3,30 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class Ball : SingletonMonoBehaviour<Ball>
+public class Ball : MonoBehaviour
 {
     #region Variables
 
-
-    public delegate void SetPlayerAlive(bool isAlive);
-
-
-    public event SetPlayerAlive setAlive;
-
     const float SPEED = 15f;
-    const float DISPLACEMENT_X = 400f;
+    const float DISPLACEMENT_X = 400;
     const float FLICKER_RATE = 0.2f;
     const float BALL_FLICKER_RATE = 0.1f;
     const float BALL_SKALE_CHANGING_TIME = 0.3f;
     const float MAX_BALL_SCALE = 3f;
     const float MIN_BALL_SCALE = 0.5f;
     const float MOUSE_ACTIVITY_MAXY_COORD = 240f;
-
-
-    [SerializeField] private float showDeathMenuDelayTime;
-    [SerializeField] private float disableBoosterDelayTime;
-    [SerializeField] private float restartLvlDelayTime;
-    [SerializeField] private float backToMortableTime;
 
 
     private Vector3 position;
@@ -36,6 +24,7 @@ public class Ball : SingletonMonoBehaviour<Ball>
     private Color endColor;
     private Color startColor;
     private Color tileFlickerColor;
+    private bool isInJump;
     private bool isIMmortal;
     private bool isReadyToJump;
     #endregion
@@ -44,14 +33,19 @@ public class Ball : SingletonMonoBehaviour<Ball>
 
     #region Properties
 
-    public bool IsInJump
+    public bool isInJumpProperty
     {
-        get;
-        set;
+        get
+        {
+            return isInJump;
+        }
+        set
+        {
+            isInJump = value;
+        }
+
     }
-
-
-    public bool IsIMmortalProperty
+    public bool isIMmortalProperty
     {
         get
         {
@@ -61,16 +55,9 @@ public class Ball : SingletonMonoBehaviour<Ball>
         {
             isIMmortal = value;
         }
+
     }
-
-
-    public bool isStarted {get; set;}
-
-
-    public bool isAlive {get; set;}
-
-
-    public bool IsReadyToJumpProperty
+    public bool isReadyToJumpProperty
     {
         get
         {
@@ -80,13 +67,15 @@ public class Ball : SingletonMonoBehaviour<Ball>
         {
             isReadyToJump = value;
         }
+
     }
+    
 
     #endregion
 
 
 
-    #region Unity lifecycle
+    #region Unty lifecycle
 
     private void Start()
     {
@@ -96,14 +85,10 @@ public class Ball : SingletonMonoBehaviour<Ball>
         position = new Vector3(-44, 300, -5);
         isIMmortal = false;
         isReadyToJump = false;
-        IsInJump = false;
+        isInJump = false;
         endColor = Color.red;
         startColor = Color.white;
         tileFlickerColor = Color.yellow;
-        showDeathMenuDelayTime = 2f;
-        disableBoosterDelayTime = 5f;
-        restartLvlDelayTime = 1.5f;
-        backToMortableTime = 1f;
     }
 
 
@@ -115,39 +100,38 @@ public class Ball : SingletonMonoBehaviour<Ball>
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.transform.CompareTag("tile") && !isIMmortal)
+        if (collision.transform.tag == "tile" && isIMmortal == false)
         {
             collision.gameObject.GetComponent<TweenColor>().style = Style.PingPong;
             TweenColor.SetColor(collision.gameObject, tileFlickerColor, FLICKER_RATE);
             ScoreController.instance.StopAllCoroutines();
-            TileSpawner.Instance.StopAllCoroutines();
+            TileSpawner.instance.StopAllCoroutines();
             StopAllCoroutines();
-            setAlive(false);
-            GameConditionsController.Instance.IsAlive = false;
-            Scheduler.Instance.CallMethodWithDelay(this.gameObject, ShowDeathMenu, showDeathMenuDelayTime);
+            GameConditionsController.instance.IsAlive = false;
+            Scheduler.Instance.CallMethodWithDelay(this.gameObject, ShowDeathMenu, 2f);
         }
 
-        if (collision.transform.CompareTag("tile") && isIMmortal && !IsInJump)
+        if (collision.transform.tag == "tile" && isIMmortal == true && isInJump == false)
         {
             collision.gameObject.SetActive(false);
         }
 
-        if (collision.transform.CompareTag("Booster"))
+        if (collision.transform.tag == "Booster")
         {
             ScoreController.instance.SetTimerStarted();
-            Scheduler.Instance.CallMethodWithDelay(this.gameObject, ScoreController.instance.DiactivateTimer, disableBoosterDelayTime);
-            if(collision.gameObject.GetComponent<Booster>().IsImmortableBoosterProperty)
+            Scheduler.Instance.CallMethodWithDelay(this.gameObject, ScoreController.instance.DiactivateTimer, 5f);
+            if(collision.gameObject.GetComponent<Booster>().isImmortableBoosterProperty)
             {                
                 collision.gameObject.SetActive(false);
                 isIMmortal = true;
-                Scheduler.Instance.CallMethodWithDelay(this, SetMortalable, disableBoosterDelayTime);
+                Scheduler.Instance.CallMethodWithDelay(this, SetMortalable, 5);
                 flicker();
             }
             else
             {
                 collision.gameObject.SetActive(false);
                 ReduceSize();
-                Scheduler.Instance.CallMethodWithDelay(this.gameObject, WaitForSetNormalScale, disableBoosterDelayTime);
+                Scheduler.Instance.CallMethodWithDelay(this.gameObject, WaitForSetNormalScale, 5f);
             }
         }
 
@@ -179,7 +163,7 @@ public class Ball : SingletonMonoBehaviour<Ball>
 
     void BallControll()
     {
-        if (GameConditionsController.Instance.IsStartedProperty && GameConditionsController.Instance.IsAlive)
+        if (GameConditionsController.instance.IsStartedProperty && GameConditionsController.instance.IsAlive)
         {
             if (Input.mousePosition.y <= MOUSE_ACTIVITY_MAXY_COORD)
             {
@@ -192,7 +176,7 @@ public class Ball : SingletonMonoBehaviour<Ball>
             }
             if (isReadyToJump && Input.GetKey(KeyCode.Space))
             {
-                IsInJump = true;
+                isInJump = true;
                 isIMmortal = true;
                 ChangeScale();
             }
@@ -202,8 +186,8 @@ public class Ball : SingletonMonoBehaviour<Ball>
 
     void ShowDeathMenu()
     {
-        GameConditionsController.Instance.ShowDeathMenu();        
-        Scheduler.Instance.CallMethodWithDelay(this.gameObject, TileSpawner.Instance.RestartLvl, restartLvlDelayTime);       
+        GameConditionsController.instance.ShowDeathMenu();        
+        Scheduler.Instance.CallMethodWithDelay(this.gameObject, TileSpawner.instance.RestartLvl, 1.5f);       
     }
 
 
@@ -218,7 +202,7 @@ public class Ball : SingletonMonoBehaviour<Ball>
     void SetMortalable()
     {
         isIMmortal = false;
-        IsInJump = false;
+        isInJump = false;
         TweenScale.SetScale(this.gameObject, normalScale, BALL_SKALE_CHANGING_TIME);   
         TweenColor.SetColor(this.gameObject, startColor, 0);
         GetComponent<TweenColor>().style = Style.Once;

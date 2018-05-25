@@ -37,7 +37,7 @@ public class ScoreController : MonoBehaviour
 
     #region Properties
 
-    public int ScoreProperty
+    public int scoreProperty
     {
         get
         {
@@ -124,9 +124,7 @@ public class ScoreController : MonoBehaviour
 
     void AddScore()
     {
-        if (GameConditionsController.Instance.IsAlive && 
-            GameConditionsController.Instance.IsStartedProperty && 
-            !TileSpawner.Instance.IsPausedProperty)
+        if (GameConditionsController.instance.IsAlive && GameConditionsController.instance.IsStartedProperty && !TileSpawner.instance.isPausedProperty)
         {
             if (Time.time >= firstTimer + SCORE_ADD_RATE)
             {
@@ -148,7 +146,7 @@ public class ScoreController : MonoBehaviour
 
     void Timer()
     {
-        if (Time.time >= secondTimer + 1 && timeVar >= 0 && GameConditionsController.Instance.IsAlive)
+        if (Time.time >= secondTimer + 1 && timeVar >= 0 && GameConditionsController.instance.IsAlive)
         {       
             timeVar--;
             diactivateTimeText.text = timeVar.ToString();
